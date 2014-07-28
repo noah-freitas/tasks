@@ -1,0 +1,7 @@
+<td class="task-name">{{ task.name }}</td>
+<td class="task-score">{{ task.score }}</td>
+<td class="task-last-completed">{{ lastCompleted(task) }}</td>
+<td class="task-complete">
+    <input ng-hide="completed" type="checkbox" ng-click="completeTask()">
+    <span ng-show="completed">Next Available On: {{ nextAvailable(task) }}</span>
+</td>
