@@ -119,6 +119,7 @@
         })
         /**
          * Task :: {
+         *     approval    :: TaskApproval
          *     completions :: [TaskCompletion]
          *     frequency   :: Number
          *     name        :: String
@@ -128,6 +129,12 @@
          * TaskCompletion :: {
          *     completedBy :: String
          *     time        :: Number
+         * }
+         *
+         * TaskApproval :: {
+         *     approved :: Boolean
+         *     by       :: [User]
+         *     on       :: Date || null
          * }
          */
         .value('Task', function Task(task) {
