@@ -113,6 +113,9 @@
         }, {
             label : 'Monthly',
             value : 2419200000
+        }, {
+            label : 'Quarterly',
+            value : 7257600000
         }])
         .filter('nextTask', function () {
             return function (tasks) {
@@ -120,7 +123,7 @@
                     var t1next = t1.completions.length > 0 ? t1.completions[t1.completions.length - 1].time + t1.frequency : 0,
                         t2next = t2.completions.length > 0 ? t2.completions[t2.completions.length - 1].time + t2.frequency : 0;
 
-                    return t1next === t2next ? t1.score - t2.score : t1next - t2next;
+                    return t1next === t2next ? t2.score - t1.score : t1next - t2next;
                 });
             }
         })
