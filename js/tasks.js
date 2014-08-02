@@ -25,7 +25,34 @@
                 $timeout(pollData, 1000);
             }
         })
-        .directive('taskDisplay', function (task, $filter) {
+        .controller('taskCompletionController', function (userStorage, $modalInstance, $scope, task, currentUser) {
+            $scope.task = task;
+            $scope.canAddUser = true;
+            $scope.currentUser = currentUser;
+            $scope.userPoints = {};
+            $scope.userPoints[$scope.currentUser.email] = $scope.task.score;
+            $scope.users = userStorage.get();
+
+            $scope.addUser = function () {
+                $scope.userPoints[$scope.currentUser.email] -= $scope.userScore;
+                $scope.userPoints[$scope.newUser.email] = $scope.userScore;
+                $scope.canAddUser = false;
+            };
+
+            $scope.cancel = function () {
+                $modalInstance.dismiss('cancel');
+            };
+
+            $scope.ok = function () {
+                $modalInstance.close(Object.keys($scope.userPoints).map(function (email) {
+                    return {
+                        score : Number($scope.userPoints[email]),
+                        user  : $scope.users.filter(function (u) { return u.email === email; })[0]
+                    };
+                }));
+            };
+        })
+        .directive('taskDisplay', function (task, $filter, $modal) {
             return {
                 link        : linkFn,
                 replace     : false,
@@ -42,8 +69,14 @@
                 $scope.nextAvailable = nextAvailable;
 
                 function completeTask() {
-                    task.complete($scope.task, $scope.user);
-                    $scope.completed = isCompleted($scope.task);
+                    $modal.open({
+                        controller  : 'taskCompletionController',
+                        resolve     : { task : function () { return $scope.task; }, currentUser: function () { return $scope.user; } },
+                        templateUrl : 'html/task-completion.html'
+                    }).result.then(function (userPoints) {
+                        task.complete($scope.task, userPoints);
+                        $scope.completed = isCompleted($scope.task);
+                    });
                 }
 
                 function isCompleted(task) {
@@ -69,15 +102,19 @@
                 complete : complete
             }
 
-            // complete :: Task, User -> undefined
-            function complete(task, user) {
-                user.score += task.score;
+            // complete :: Task, [{ score :: Number, user :: User }] -> undefined
+            function complete(task, userScores) {
+                userScores.forEach(function (userScore) {
+                    userScore.user.score += userScore.score;
+                    userStorage.save(userScore.user);
+                });
+
                 task.completions.push({
-                    completedBy : user,
+                    completedBy : userScores[0].user,
                     time        : Date.now()
                 });
+
                 taskStorage.save(task);
-                userStorage.save(user);
             }
         })
         /**

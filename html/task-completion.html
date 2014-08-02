@@ -1,0 +1,51 @@
+<div class="modal-header">
+    <h3 class="modal-title">Complete {{ $parent.task.name }}</h3>
+</div>
+<div class="modal-body">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="(name, score) in userPoints">
+                <td>{{ name }}</td>
+                <td>{{ score }}</td>
+            </tr>
+        </tbody>
+        <tfoot ng-show="canAddUser">
+            <tr>
+                <td>
+                    <label>Add a User:
+                        <select
+                            class="form-control"
+                            ng-model="$parent.newUser"
+                            ng-options="user as user.email for user in users"
+                        ></select>
+                    </label>
+                </td>
+                <td>
+                    <label>Score
+                        <input
+                            class="form-control"
+                            type="number"
+                            ng-model="$parent.userScore"
+                            max="{{ $parent.task.score }}"
+                        >
+                    </label>
+                    <button
+                        class="btn btn-primary"
+                        ng-click="addUser()"
+                        ng-disabled="!newUser || !userScore"
+                    >Add User</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>
