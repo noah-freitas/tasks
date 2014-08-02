@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('tasks', [])
-        .controller('tasksController', function (Task, taskFrequencies, taskStorage, userStorage, $scope) {
+    angular.module('tasks', ['ui.bootstrap'])
+        .controller('tasksController', function (Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
             $scope.addTask     = addTask;
             $scope.currentUser = null;
             $scope.frequencies = taskFrequencies;
@@ -10,11 +10,19 @@
             $scope.tasks       = taskStorage.get();
             $scope.users       = userStorage.get();
 
+            $timeout(pollData, 1000);
+
             function addTask(task) {
                 var newTask = Task({ frequency : task.frequency, name : task.name, score : task.score });
                 $scope.tasks.push(newTask);
                 taskStorage.save(newTask);
                 $scope.newTask = { frequency : null, name : null, score : null };
+            }
+
+            function pollData() {
+                $scope.tasks = taskStorage.get();
+                $scope.users = userStorage.get();
+                $timeout(pollData, 1000);
             }
         })
         .directive('taskDisplay', function (task, $filter) {
