@@ -111,7 +111,7 @@
                 function lastCompleted(task) {
                     var lastCompletion = task.completions[task.completions.length - 1];
                     return lastCompletion ?
-                        dateFilter(lastCompletion.time) + ' by ' + lastCompletion.completedBy.email :
+                        dateFilter(lastCompletion.time) + ' by ' + lastCompletion.completedBy[0].user :
                         'Never';
                 }
             }
@@ -129,11 +129,50 @@
                 });
 
                 task.completions.push({
-                    completedBy : userScores[0].user,
+                    completedBy : userScores.map(function (userScore) { return { score : userScore.score, user : user.email }; }),
                     time        : Date.now()
                 });
 
                 taskStorage.save(task);
+            }
+        })
+        .filter('score', function (taskStorage) {
+            var today = todayBeginning(),
+                sevenDay = today - 604800000;
+
+            return function (user, time) {
+                switch (time) {
+                    case '7days' : return scoreFrom(sevenDay, user);
+                    case 'today' : return scoreFrom(today, user);
+                    default      : throw new Error('Unknown score filter time: ' + time);
+                }
+            };
+
+            // scoreFrom :: Number, { email :: String } -> Number
+            function scoreFrom(beginning, user) {
+                // TODO: refactor this.
+                return taskStorage.get().filter(function (t) {
+                    return t.completions.filter(function (c) {
+                        return c.completedBy.some(function (completion) {
+                            return completion.user === user.email;
+                        }) && c.time > beginning;
+                    }).length > 0;
+                }).reduce(function (acc, t) {
+                    return acc + t.completions.filter(function (c) {
+                        return c.time > beginning;
+                    })[0].completedBy.filter(function (c) {
+                        return c.user === user.email;
+                    })[0].score;
+                }, 0);
+            }
+
+            // todayBeginning :: undefined -> Number
+            function todayBeginning() {
+                var date = new Date();
+                date.setHours(0);
+                date.setMinutes(0);
+                date.setMilliseconds(0);
+                return date.getTime();
             }
         })
         /**
@@ -146,7 +185,7 @@
          * }
          *
          * TaskCompletion :: {
-         *     completedBy :: String
+         *     completedBy :: [{ email :: String, score :: Number }]
          *     time        :: Number
          * }
          *
