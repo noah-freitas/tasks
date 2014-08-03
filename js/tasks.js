@@ -68,6 +68,7 @@
                 $scope.lastCompleted = lastCompleted;
                 $scope.nextAvailable = nextAvailable;
 
+                // completeTask :: undefined -> undefined
                 function completeTask() {
                     $modal.open({
                         controller  : 'taskCompletionController',
@@ -79,16 +80,34 @@
                     });
                 }
 
+                // isCompleted :: Task -> Boolean
                 function isCompleted(task) {
                     var lastCompletion = task.completions && task.completions[task.completions.length - 1];
+
+                    // Normalize last completion times so that tasks are available at midnight of the
+                    // day on which they become available.
+                    if (lastCompletion) {
+                        var last = new Date(lastCompletion.time);
+
+                        // Only normalize if this is a new day.
+                        if (last.getDay() !== new Date().getDay()) {
+                            last.setHours(0);
+                            last.setMinutes(0);
+                            last.setMilliseconds(0);
+                            lastCompletion.time = last.getTime();
+                        }
+                    }
+
                     return lastCompletion && $scope.task.frequency + lastCompletion.time > Date.now();
                 }
 
+                // nextAvailable :: Task -> String
                 function nextAvailable(task) {
                     var lastCompletion = task.completions[task.completions.length - 1];
                     return lastCompletion ? dateFilter(lastCompletion.time + task.frequency) : 'Now';
                 }
 
+                // lastCompleted :: Task -> String
                 function lastCompleted(task) {
                     var lastCompletion = task.completions[task.completions.length - 1];
                     return lastCompletion ?
