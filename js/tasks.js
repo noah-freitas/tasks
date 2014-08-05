@@ -129,7 +129,7 @@
                 });
 
                 task.completions.push({
-                    completedBy : userScores.map(function (userScore) { return { score : userScore.score, user : user.email }; }),
+                    completedBy : userScores.map(function (us) { return { score : us.score, user : us.user.email }; }),
                     time        : Date.now()
                 });
 
@@ -151,19 +151,24 @@
             // scoreFrom :: Number, { email :: String } -> Number
             function scoreFrom(beginning, user) {
                 // TODO: refactor this.
-                return taskStorage.get().filter(function (t) {
-                    return t.completions.filter(function (c) {
-                        return c.completedBy.some(function (completion) {
-                            return completion.user === user.email;
-                        }) && c.time > beginning;
-                    }).length > 0;
-                }).reduce(function (acc, t) {
-                    return acc + t.completions.filter(function (c) {
-                        return c.time > beginning;
-                    })[0].completedBy.filter(function (c) {
-                        return c.user === user.email;
-                    })[0].score;
+                return flatten(flatten(taskStorage.get().filter(function (t) {
+                    return t.completions.length > 0;
+                }).map(function (t) {
+                    return t.completions;
+                })).filter(function (c) {
+                    return c.time > beginning;
+                }).map(function (c) {
+                    return c.completedBy;
+                })).filter(function (item) {
+                    return item.user === user.email;
+                }).reduce(function (acc, item) {
+                    return acc + item.score;
                 }, 0);
+
+            }
+
+            function flatten(as) {
+                return Array.prototype.concat.apply([], as);
             }
 
             // todayBeginning :: undefined -> Number
@@ -185,7 +190,7 @@
          * }
          *
          * TaskCompletion :: {
-         *     completedBy :: [{ email :: String, score :: Number }]
+         *     completedBy :: [{ user :: String, score :: Number }]
          *     time        :: Number
          * }
          *
