@@ -123,11 +123,6 @@
 
             // complete :: Task, [{ score :: Number, user :: User }] -> undefined
             function complete(task, userScores) {
-                userScores.forEach(function (userScore) {
-                    userScore.user.score += userScore.score;
-                    userStorage.save(userScore.user);
-                });
-
                 task.completions.push({
                     completedBy : userScores.map(function (us) { return { score : us.score, user : us.user.email }; }),
                     time        : Date.now()
@@ -142,9 +137,11 @@
 
             return function (user, time) {
                 switch (time) {
-                    case '7days' : return scoreFrom(sevenDay, user);
-                    case 'today' : return scoreFrom(today, user);
-                    default      : throw new Error('Unknown score filter time: ' + time);
+                    case 'alltime' : return scoreFrom(0, user);
+                    case '7days'   : return scoreFrom(sevenDay, user);
+                    case 'today'   : return scoreFrom(today, user);
+                    default        : throw new Error('Unknown score filter time: ' + time);
+
                 }
             };
 
