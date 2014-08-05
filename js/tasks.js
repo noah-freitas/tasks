@@ -159,7 +159,7 @@
                 })).filter(function (item) {
                     return item.user === user.email;
                 }).reduce(function (acc, item) {
-                    return acc + item.score;
+                    return acc + Number(item.score);
                 }, 0);
 
             }
