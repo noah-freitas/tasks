@@ -90,7 +90,7 @@
                         var last = new Date(lastCompletion.time);
 
                         // Only normalize if this is a new day.
-                        if (last.getDay() !== new Date().getDay()) {
+                        if (last.getDate() !== new Date().getDate()) {
                             last.setHours(0);
                             last.setMinutes(0);
                             last.setMilliseconds(0);
