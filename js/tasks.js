@@ -5,6 +5,7 @@
         .controller('tasksController', function (Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
             $scope.addTask     = addTask;
             $scope.currentUser = null;
+            $scope.filter      = '';
             $scope.frequencies = taskFrequencies;
             $scope.newTask     = { frequency : null, name : null, score : null };
             $scope.tasks       = taskStorage.get();

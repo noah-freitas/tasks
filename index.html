@@ -37,6 +37,7 @@
                 </table>
             </div>
             <div class="col-md-9">
+                <input class="form-control" type="text" ng-model="filter" placeholder="Filter">
                 <table class="table">
                     <thead>
                         <tr>
@@ -47,7 +48,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="task in tasks | nextTask" task-display task="task" user="currentUser"> </tr>
+                        <tr ng-repeat="task in tasks | nextTask | filter:filter" task-display task="task" user="currentUser"> </tr>
                     </tbody>
                     <tfoot>
                         <td><input class="form-control" type="text" ng-model="newTask.name" placeholder="Name"></td>
