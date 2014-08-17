@@ -135,14 +135,20 @@
                 // Normalize last completion times so that tasks are available at midnight of the
                 // day on which they become available.
                 if (lastCompletion) {
-                    var last = new Date(lastCompletion.time);
+                    var last = new Date(lastCompletion.time),
+                        now  = new Date();
 
                     // Only normalize if this is a new day.
-                    if (last.getDate() !== new Date().getDate()) {
+                    if (last.getDate() !== now.getDate()) {
                         last.setHours(0);
                         last.setMinutes(0);
                         last.setMilliseconds(0);
                         lastCompletion.time = last.getTime();
+                    }
+
+                    // Reset weekly tasks on Sunday.
+                    if (task.frequency === 604800000 && now.getDay() < last.getDay() && last.getDate() < now.getDate()) {
+                        return false;
                     }
                 }
 
