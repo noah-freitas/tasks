@@ -46,13 +46,23 @@
                                     <input autofocus class="form-control" type="text" ng-model="filter">
                                 </div>
                             </th>
-                            <th colspan="2">
+                            <th>
                                 <div class="form-group">
                                     <label>Last Completed</label>
                                     <select
                                         class="form-control"
                                         ng-model="filLastCom"
                                         ng-options="filter.value as filter.label for filter in lastComFils"
+                                    ></select>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="form-group">
+                                    <label>Available</label>
+                                    <select
+                                        class="form-control"
+                                        ng-model="filAvail"
+                                        ng-options="filter for filter in availFilter"
                                     ></select>
                                 </div>
                             </th>
@@ -66,7 +76,7 @@
                     </thead>
                     <tbody>
                         <tr
-                            ng-repeat="task in tasks | nextTask | filter:filter | lastComplete:filLastCom"
+                            ng-repeat="task in tasks | nextTask | filter:filter | lastComplete:filLastCom | available:filAvail"
                             task-display
                             task="task"
                             user="currentUser"

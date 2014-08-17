@@ -4,9 +4,11 @@
     angular.module('tasks', ['ui.bootstrap'])
         .controller('tasksController', function (lastCompleteFilters, Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
             $scope.addTask     = addTask;
+            $scope.availFilter = ['Both', 'Not Complete', 'Complete'];
             $scope.colorTask   = colorTask;
             $scope.currentUser = null;
             $scope.filter      = '';
+            $scope.filAvail    = 'Both';
             $scope.filLastCom  = Infinity;
             $scope.frequencies = taskFrequencies;
             $scope.lastComFils = lastCompleteFilters;
@@ -78,7 +80,7 @@
 
             function linkFn($scope) {
                 var dateFilter       = $filter('date', 'short');
-                $scope.completed     = isCompleted($scope.task);
+                $scope.completed     = task.isComplete($scope.task);
                 $scope.completeTask  = completeTask;
                 $scope.lastCompleted = lastCompleted;
                 $scope.nextAvailable = nextAvailable;
@@ -93,27 +95,6 @@
                         task.complete($scope.task, userPoints);
                         $scope.completed = isCompleted($scope.task);
                     });
-                }
-
-                // isCompleted :: Task -> Boolean
-                function isCompleted(task) {
-                    var lastCompletion = task.completions && task.completions[task.completions.length - 1];
-
-                    // Normalize last completion times so that tasks are available at midnight of the
-                    // day on which they become available.
-                    if (lastCompletion) {
-                        var last = new Date(lastCompletion.time);
-
-                        // Only normalize if this is a new day.
-                        if (last.getDate() !== new Date().getDate()) {
-                            last.setHours(0);
-                            last.setMinutes(0);
-                            last.setMilliseconds(0);
-                            lastCompletion.time = last.getTime();
-                        }
-                    }
-
-                    return lastCompletion && $scope.task.frequency + lastCompletion.time > Date.now();
                 }
 
                 // nextAvailable :: Task -> String
@@ -131,9 +112,10 @@
                 }
             }
         })
-        .factory('task', function (taskStorage, userStorage) {
+        .factory('task', function (taskStorage) {
             return {
-                complete : complete
+                isComplete : isComplete,
+                complete   : complete
             };
 
             // complete :: Task, [{ score :: Number, user :: User }] -> undefined
@@ -145,6 +127,34 @@
 
                 taskStorage.save(task);
             }
+
+            // isCompleted :: Task -> Boolean
+            function isComplete(task) {
+                var lastCompletion = task.completions && task.completions[task.completions.length - 1];
+
+                // Normalize last completion times so that tasks are available at midnight of the
+                // day on which they become available.
+                if (lastCompletion) {
+                    var last = new Date(lastCompletion.time);
+
+                    // Only normalize if this is a new day.
+                    if (last.getDate() !== new Date().getDate()) {
+                        last.setHours(0);
+                        last.setMinutes(0);
+                        last.setMilliseconds(0);
+                        lastCompletion.time = last.getTime();
+                    }
+                }
+
+                return lastCompletion && task.frequency + lastCompletion.time > Date.now();
+            }
+        })
+        .filter('available', function (task) {
+            return function (tasks, complete) {
+                return complete === 'Both' ? tasks : tasks.filter(function (t) {
+                    return complete === (task.isComplete(t) ? 'Complete' : 'Not Complete');
+                });
+            };
         })
         .filter('lastComplete', function () {
             return function (tasks, lastComplete) {
