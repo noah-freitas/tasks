@@ -5,7 +5,6 @@
         .controller('tasksController', function (lastCompleteFilters, Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
             $scope.addTask     = addTask;
             $scope.availFilter = ['Both', 'Not Complete', 'Complete'];
-            $scope.colorTask   = colorTask;
             $scope.currentUser = null;
             $scope.filter      = '';
             $scope.filAvail    = 'Both';
@@ -23,17 +22,6 @@
                 $scope.tasks.push(newTask);
                 taskStorage.save(newTask);
                 $scope.newTask = { frequency : null, name : null, score : null };
-            }
-
-            function colorTask(task) {
-                switch (task.score) {
-                    case 800 :
-                    case 600 : return 'rgba(6, 191, 85, 0.8)';
-                    case 400 : return 'rgba(218, 209, 95, 0.8)';
-                    case 300 :
-                    case 200 : return 'rgba(244, 135, 70, 0.8)';
-                    case 100 : return 'rgba(241, 92, 60, 0.8)';
-                }
             }
 
             function pollData() {
@@ -80,10 +68,22 @@
 
             function linkFn($scope) {
                 var dateFilter       = $filter('date', 'short');
+                $scope.colorTask     = colorTask;
                 $scope.completed     = task.isComplete($scope.task);
                 $scope.completeTask  = completeTask;
                 $scope.lastCompleted = lastCompleted;
                 $scope.nextAvailable = nextAvailable;
+
+                function colorTask(task) {
+                    switch (task.score) {
+                        case 800 :
+                        case 600 : return 'rgba(6, 191, 85, 1.0)';
+                        case 400 : return 'rgba(218, 209, 95, 1.0)';
+                        case 300 :
+                        case 200 : return 'rgba(244, 135, 70, 1.0)';
+                        case 100 : return 'rgba(241, 92, 60, 1.0)';
+                    }
+                }
 
                 // completeTask :: undefined -> undefined
                 function completeTask() {
