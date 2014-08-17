@@ -4,6 +4,7 @@
     angular.module('tasks', ['ui.bootstrap'])
         .controller('tasksController', function (Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
             $scope.addTask     = addTask;
+            $scope.colorTask   = colorTask;
             $scope.currentUser = null;
             $scope.filter      = '';
             $scope.frequencies = taskFrequencies;
@@ -18,6 +19,17 @@
                 $scope.tasks.push(newTask);
                 taskStorage.save(newTask);
                 $scope.newTask = { frequency : null, name : null, score : null };
+            }
+
+            function colorTask(task) {
+                switch (task.score) {
+                    case 800 :
+                    case 600 : return 'rgba(6, 191, 85, 0.8)';
+                    case 400 : return 'rgba(218, 209, 95, 0.8)';
+                    case 300 :
+                    case 200 : return 'rgba(244, 135, 70, 0.8)';
+                    case 100 : return 'rgba(241, 92, 60, 0.8)';
+                }
             }
 
             function pollData() {
