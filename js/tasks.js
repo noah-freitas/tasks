@@ -62,7 +62,7 @@
                 link        : linkFn,
                 replace     : false,
                 restrict    : 'AE',
-                scope       : { task : '=', user : '=' },
+                scope       : { index: '@', task : '=', user : '=' },
                 templateUrl : 'html/task-display.html'
             };
 
@@ -73,6 +73,7 @@
                 $scope.completeTask  = completeTask;
                 $scope.lastCompleted = lastCompleted;
                 $scope.nextAvailable = nextAvailable;
+                $scope.rowIndex      = Number($scope.index) + 1;
 
                 function colorTask(task) {
                     switch (task.score) {
