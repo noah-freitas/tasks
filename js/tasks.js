@@ -230,13 +230,13 @@
             label : 'Whenever',
             value : Infinity
         }, {
-            label : 'Today',
+            label : '24 Hours',
             value : 86400000
         }, {
-            label : 'This Week',
+            label : '7 Days',
             value : 604800000
         }, {
-            label : 'This Month',
+            label : '30 Days',
             value : 2419200000
         }])
         .value('taskFrequencies', [{
