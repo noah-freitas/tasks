@@ -37,9 +37,26 @@
                 </table>
             </div>
             <div class="col-md-9">
-                <input class="form-control" type="text" ng-model="filter" placeholder="Filter">
                 <table class="table">
                     <thead>
+                        <tr>
+                            <th colspan="2">
+                                <div class="form-group">
+                                    <label>Filter</label>
+                                    <input autofocus class="form-control" type="text" ng-model="filter">
+                                </div>
+                            </th>
+                            <th colspan="2">
+                                <div class="form-group">
+                                    <label>Last Completed</label>
+                                    <select
+                                        class="form-control"
+                                        ng-model="filLastCom"
+                                        ng-options="filter.value as filter.label for filter in lastComFils"
+                                    ></select>
+                                </div>
+                            </th>
+                        </tr>
                         <tr>
                             <th class="task-name">Name</th>
                             <th class="task-score">Score</th>
@@ -49,7 +66,7 @@
                     </thead>
                     <tbody>
                         <tr
-                            ng-repeat="task in tasks | nextTask | filter:filter"
+                            ng-repeat="task in tasks | nextTask | filter:filter | lastComplete:filLastCom"
                             task-display
                             task="task"
                             user="currentUser"

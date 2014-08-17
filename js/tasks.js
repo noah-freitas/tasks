@@ -2,12 +2,14 @@
     'use strict';
 
     angular.module('tasks', ['ui.bootstrap'])
-        .controller('tasksController', function (Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
+        .controller('tasksController', function (lastCompleteFilters, Task, taskFrequencies, taskStorage, userStorage, $scope, $timeout) {
             $scope.addTask     = addTask;
             $scope.colorTask   = colorTask;
             $scope.currentUser = null;
             $scope.filter      = '';
+            $scope.filLastCom  = Infinity;
             $scope.frequencies = taskFrequencies;
+            $scope.lastComFils = lastCompleteFilters;
             $scope.newTask     = { frequency : null, name : null, score : null };
             $scope.tasks       = taskStorage.get();
             $scope.users       = userStorage.get();
@@ -132,7 +134,7 @@
         .factory('task', function (taskStorage, userStorage) {
             return {
                 complete : complete
-            }
+            };
 
             // complete :: Task, [{ score :: Number, user :: User }] -> undefined
             function complete(task, userScores) {
@@ -143,6 +145,12 @@
 
                 taskStorage.save(task);
             }
+        })
+        .filter('lastComplete', function () {
+            return function (tasks, lastComplete) {
+                var now = Date.now() - lastComplete;
+                return lastComplete === Infinity ? tasks : tasks.filter(function (t) { return t.completions.some(function (c) { return c.time > now; }); });
+            };
         })
         .filter('score', function (taskStorage) {
             var today = todayBeginning(),
@@ -218,6 +226,19 @@
 
             return task;
         })
+        .value('lastCompleteFilters', [{
+            label : 'Whenever',
+            value : Infinity
+        }, {
+            label : 'Today',
+            value : 86400000
+        }, {
+            label : 'This Week',
+            value : 604800000
+        }, {
+            label : 'This Month',
+            value : 2419200000
+        }])
         .value('taskFrequencies', [{
             label : 'Daily',
             value : 86400000
