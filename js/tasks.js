@@ -93,7 +93,7 @@
                         templateUrl : 'html/task-completion.html'
                     }).result.then(function (userPoints) {
                         task.complete($scope.task, userPoints);
-                        $scope.completed = isCompleted($scope.task);
+                        $scope.completed = task.isComplete($scope.task);
                     });
                 }
 
