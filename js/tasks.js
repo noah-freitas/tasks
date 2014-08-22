@@ -147,10 +147,11 @@
                         lastCompletion.time = last.getTime();
                     }
 
-                    // Reset weekly tasks on Sunday.
-                    if (task.frequency === 604800000 && now.getDay() < last.getDay() && last.getDate() < now.getDate()) {
-                        return false;
-                    }
+                    // Make weekly tasks available after 4 days.
+                    if (task.frequency === 604800000 && now.getTime() - last.getTime() > 345600000) return false;
+
+                    // Make bi-weekly tasks available after 1 week and 4 days.
+                    if (task.frequency === 1209600000 && now.getTime() - last.getTime() > 950400000) return false;
                 }
 
                 return lastCompletion && task.frequency + lastCompletion.time > Date.now();
@@ -158,7 +159,7 @@
         })
         .filter('available', function (task) {
             return function (tasks, complete) {
-                return complete === 'Both' ? tasks : tasks.filter(function (t) {
+                return complete === -Infinity ? tasks : tasks.filter(function (t) {
                     return complete === (task.isComplete(t) ? 'Complete' : 'Not Complete');
                 });
             };
@@ -217,7 +218,6 @@
         })
         /**
          * Task :: {
-         *     approval    :: TaskApproval
          *     completions :: [TaskCompletion]
          *     frequency   :: Number
          *     name        :: String
@@ -227,12 +227,6 @@
          * TaskCompletion :: {
          *     completedBy :: [{ user :: String, score :: Number }]
          *     time        :: Number
-         * }
-         *
-         * TaskApproval :: {
-         *     approved :: Boolean
-         *     by       :: [User]
-         *     on       :: Date || null
          * }
          */
         .value('Task', function Task(task) {
@@ -271,6 +265,22 @@
         }, {
             label : 'Quarterly',
             value : 7257600000
+        }])
+        .value('nextAvailableFilters', [{
+            label : 'Whenever',
+            value : -Infinity
+        }, {
+            label : 'Now',
+            value : -86400000
+        }, {
+            label : 'This Week',
+            value : 604800000
+        }, {
+            label : 'Next Week',
+            value : 604800000
+        }, {
+            label : 'This Month',
+            value : 2419200000
         }])
         .filter('nextTask', function () {
             return function (tasks) {
@@ -336,7 +346,6 @@
         /**
          * User :: {
          *     email :: String
-         *     score :: Number
          * }
          */
         .value('User', function User(user) {
