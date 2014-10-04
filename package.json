@@ -1,0 +1,19 @@
+{
+  "name": "tasks",
+  "version": "0.1.1",
+  "description": "A leader board based task application",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/noah-freitas/tasks.git"
+  },
+  "author": "Noah J. Freitas <noah.j.freitas@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noah-freitas/tasks/issues"
+  },
+  "homepage": "https://github.com/noah-freitas/tasks"
+}
